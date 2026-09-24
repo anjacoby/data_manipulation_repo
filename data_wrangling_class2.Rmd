@@ -1,0 +1,235 @@
+---
+title: "data_wrangling_class1"
+output: github_document
+date: "2026-09-24"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+This file is for doing data import
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(haven)
+```
+
+## Importing two datasets
+
+Import out first dataset
+```{r}
+litters_df =
+  read_csv(
+    file = "data_file/FAS_litters.csv",
+   na = c("", "NA",".")
+  )
+litters_df
+
+# makes it into snake case 
+litters_df =janitor:: clean_names(litters_df)
+```
+Import the pups dataset
+using na formats all the missing values (.) and the NAs to read as missing 
+```{r}
+pups_df = 
+  read_csv(
+    file = "data_file/FAS_pups.csv", 
+    skip = 3,
+    na = c("","NA",".")
+  )
+  
+pups_df = janitor::clean_names(pups_df) 
+  
+```
+
+## Look at the data 
+```{r}
+litters_df
+pups_df
+```
+
+Head or tail of the dataset 
+```{r}
+head(litters_df, 20)
+
+tail(pups_df, 5)
+```
+
+skimming? 
+using :: is for when you want to use one feature of a package without loading the whole package. 
+```{r}
+skimr::skim(pups_df)
+```
+
+viewing- don't do this in R markdown just in the command 
+```{r}
+# view(pups_df) 
+```
+
+tells you what you can do when reading a csv
+```{r}
+#?read_csv
+```
+
+## oh excel .....
+Importing new dataset from excel 
+```{r}
+mlb_df =
+  read_excel("data_file/mlb11.xlsx")
+```
+
+Look at the data 
+```{r}
+mlb_df
+
+```
+
+tells you what you can do when reading an excel file
+```{r}
+# ?read_excel 
+```
+
+Import FOTR words
+```{r}
+FOTR_df= 
+  read_excel("data_file/LotR_Words.xlsx",
+              range = "B3:D6"
+             )
+
+FOTR_df
+
+```
+
+Importing the Two Towers Table 
+```{r}
+FOTR2_df= 
+  read_excel("data_file/LotR_Words.xlsx",
+              range = "F3:H6"
+             )
+FOTR2_df
+```
+
+## Import SAS 
+Read in the pulse dataset
+```{r}
+Pulse_df=
+  read_sas("data_file/public_pulse_data.sas7bdat")
+
+Pulse_df = janitor::clean_names(Pulse_df)
+
+```
+
+## What's so bad about 'read.csv()'
+Import pups with 'read.csv()
+```{r}
+pups_df_base =
+  read.csv("data_file/FAS_pups.csv")
+
+pups_df_base
+```
+
+Won't show: lazy about variable names; super slow for big datasets 
+
+```{r}
+select(litters_df, group, litter_number, gd0_weight, pups_born_alive)
+select(litters_df, group:gd_of_birth)
+select(litters_df, -pups_survive)
+select(litters_df, GROUP = group, LiTtEr_NuMbEr = litter_number)
+
+```
+
+
+```{r}
+relocate(litters_df, litter_number, pups_survive)
+
+```
+
+
+```{r}
+# another way to rename variables 
+rename(litters_df, GROUP = group)
+
+# moves these variables to the front
+relocate(litters_df, litter_number, gd0_weight)
+```
+
+In the pups data, select litter number, sex, and PD ears
+```{r}
+# shows only the variable you name 
+select(pups_df, litter_number, sex, pd_ears)
+```
+
+## 'filter' some rows 
+```{r}
+filter(litters_df, gd_of_birth == 20) 
+
+filter(litters_df, pups_born_alive <= 5)
+
+filter(litters_df, pups_born_alive != 6)
+
+filter(litters_df, group %in% c("Con7", "Con8"), pups_born_alive < 7) 
+
+# removes the rows with the missing values for those variables 
+drop_na(litters_df, gd0_weight) 
+```
+
+In the pups dataset, keep only rows where PD walk is less than 11 and sex is 2
+```{r}
+filter(pups_df, pd_walk < 11, sex == 2)
+```
+
+#mutate to change some columns
+
+lets add and change some columns
+```{r}
+mutate(
+  litters_df, 
+  wt_gain = gd18_weight - gd0_weight,
+  wt_gain_squared = wt_gain^2,
+  group = str_to_lower(group))
+
+```
+In the pups dataset, create a variable that subtracts 7 from PD walk
+
+```{r}
+mutate(pups_df, pd_walk_minus_7 = pd_walk - 7)
+```
+
+```{r}
+arrange(litters_df, pups_born_alive)
+arrange(litters_df, desc(pups_born_alive))
+```
+
+
+
+
+
+
+
+
+
+
+
