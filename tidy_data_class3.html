@@ -379,6 +379,8 @@ library(haven)</code></pre>
 </div>
 <div id="tidying-data" class="section level1">
 <h1>tidying data</h1>
+<p>take column names and put them into a new variable, take values and
+put them into a new variable</p>
 <pre class="r"><code>pulse_tidy_df = 
   pulse_df |&gt; 
   pivot_longer(
@@ -417,6 +419,60 @@ library(haven)</code></pre>
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<p>#untidying data</p>
+<pre class="r"><code>analysis_result = 
+  tibble(
+    group = c(&quot;treatment&quot;, &quot;treatment&quot;, &quot;placebo&quot;, &quot;placebo&quot;),
+    time = c(&quot;pre&quot;, &quot;post&quot;, &quot;pre&quot;, &quot;post&quot;),
+    mean = c(4, 8, 3.5, 4)
+  )
+analysis_result</code></pre>
+<pre><code>## # A tibble: 4 × 3
+##   group     time   mean
+##   &lt;chr&gt;     &lt;chr&gt; &lt;dbl&gt;
+## 1 treatment pre     4  
+## 2 treatment post    8  
+## 3 placebo   pre     3.5
+## 4 placebo   post    4</code></pre>
+<p>pull values and put them into new column</p>
+<p>Check this code:</p>
+<p>analysis_result |&gt; pivot_wider( names_from = time, values_from =
+mean_outcome ) |&gt; knitr::kable()</p>
+<pre class="r"><code>pivot_wider(
+  analysis_result, 
+  names_from = &quot;time&quot;, 
+  values_from = &quot;mean&quot;)</code></pre>
+<pre><code>## # A tibble: 2 × 3
+##   group       pre  post
+##   &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt;
+## 1 treatment   4       8
+## 2 placebo     3.5     4</code></pre>
+<p>#new example</p>
+<pre class="r"><code>fellowship_df = 
+  readxl::read_excel(&quot;data_file/LotR_Words.xlsx&quot;, range = &quot;B3:D6&quot;) |&gt; 
+  mutate(movie = &quot;fellowship&quot;)
+
+# copy and pasting the code and changing df name and cell ranges from same excel file
+
+two_towers_df = 
+  readxl::read_excel(&quot;data_file/LotR_Words.xlsx&quot;, range = &quot;F3:H6&quot;) |&gt; 
+  mutate(movie = &quot;two towers&quot;)
+
+return_df = 
+  readxl::read_excel(&quot;data_file/LotR_Words.xlsx&quot;, range = &quot;J3:L6&quot;) |&gt; 
+  mutate(movie = &quot;return&quot;)
+
+#once you have copy and pasted your code more than twice, you should write a function to do it and make it easier (we will do this later)</code></pre>
+<p>Next, let’s put it all together and tidy</p>
+<pre class="r"><code>lotr_df = 
+  bind_rows(fellowship_df, two_towers_df, return_df) |&gt;
+  janitor::clean_names() |&gt; 
+  relocate(movie) |&gt; 
+  pivot_longer(
+    female:male,
+    names_to = &quot;gender&quot;,
+    values_to = &quot;words&quot;
+  )</code></pre>
 </div>
 
 

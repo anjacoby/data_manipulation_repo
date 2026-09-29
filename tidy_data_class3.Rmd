@@ -23,7 +23,9 @@ pulse_df =
 ```
 
 
-# tidying data
+# tidying data 
+
+take column names and put them into a new variable, take values and put them into a new variable
 
 ```{r}
 pulse_tidy_df = 
@@ -61,7 +63,71 @@ pulse_df =
   )
 ```
 
+#untidying data
 
+```{r}
+analysis_result = 
+  tibble(
+    group = c("treatment", "treatment", "placebo", "placebo"),
+    time = c("pre", "post", "pre", "post"),
+    mean = c(4, 8, 3.5, 4)
+  )
+analysis_result
+```
+
+
+pull values and put them into new column
+
+Check this code:
+
+analysis_result |> 
+  pivot_wider(
+    names_from = time,
+    values_from = mean_outcome
+  ) |> 
+  knitr::kable()
+  
+```{r}
+pivot_wider(
+  analysis_result, 
+  names_from = "time", 
+  values_from = "mean")
+  
+```
+
+#new example
+
+```{r}
+fellowship_df = 
+  readxl::read_excel("data_file/LotR_Words.xlsx", range = "B3:D6") |> 
+  mutate(movie = "fellowship")
+
+# copy and pasting the code and changing df name and cell ranges from same excel file
+
+two_towers_df = 
+  readxl::read_excel("data_file/LotR_Words.xlsx", range = "F3:H6") |> 
+  mutate(movie = "two towers")
+
+return_df = 
+  readxl::read_excel("data_file/LotR_Words.xlsx", range = "J3:L6") |> 
+  mutate(movie = "return")
+
+#once you have copy and pasted your code more than twice, you should write a function to do it and make it easier (we will do this later)
+
+```
+
+Next, let's put it all together and tidy
+```{r}
+lotr_df = 
+  bind_rows(fellowship_df, two_towers_df, return_df) |>
+  janitor::clean_names() |> 
+  relocate(movie) |> 
+  pivot_longer(
+    female:male,
+    names_to = "gender",
+    values_to = "words"
+  )
+```
 
 
 
