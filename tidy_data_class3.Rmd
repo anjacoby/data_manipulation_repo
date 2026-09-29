@@ -139,7 +139,7 @@ pups_df =
     na = c(".", "", "NA")) |> 
   janitor::clean_names() |> 
   mutate(
-    sex = case_match( # recoding variables, 1 is male and 2 is female
+    sex = recode_values( # recoding variables, 1 is male and 2 is female (double check case_match vs recode_variables)
       sex,
       1 ~ "male",
       2 ~ "female"
@@ -152,7 +152,7 @@ litters_df =
     na = c(".", "", "NA")) |> 
   janitor::clean_names() |> 
   relocate(litter_number) |>  # want litter number to appear first
-  separate(group, into = c("dose", "day_of_tx"), 3) |> 
+  separate(group, into = c("dose", "day_of_tx"), 3) |> # split at the third character
   mutate(
     dose = str_to_lower(dose),
     day_of_tx = as.numeric(day_of_tx),

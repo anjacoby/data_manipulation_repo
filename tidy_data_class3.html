@@ -482,7 +482,7 @@ return_df =
     na = c(&quot;.&quot;, &quot;&quot;, &quot;NA&quot;)) |&gt; 
   janitor::clean_names() |&gt; 
   mutate(
-    sex = case_match( # recoding variables, 1 is male and 2 is female
+    sex = recode_values( # recoding variables, 1 is male and 2 is female (double check case_match vs recode_variables)
       sex,
       1 ~ &quot;male&quot;,
       2 ~ &quot;female&quot;
@@ -496,18 +496,13 @@ return_df =
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre><code>## Warning: There was 1 warning in `mutate()`.
-## ℹ In argument: `sex = case_match(sex, 1 ~ &quot;male&quot;, 2 ~ &quot;female&quot;)`.
-## Caused by warning:
-## ! `case_match()` was deprecated in dplyr 1.2.0.
-## ℹ Please use `recode_values()` instead.</code></pre>
 <pre class="r"><code>litters_df = 
   read_csv(
     &quot;data_file/FAS_litters.csv&quot;,
     na = c(&quot;.&quot;, &quot;&quot;, &quot;NA&quot;)) |&gt; 
   janitor::clean_names() |&gt; 
   relocate(litter_number) |&gt;  # want litter number to appear first
-  separate(group, into = c(&quot;dose&quot;, &quot;day_of_tx&quot;), 3) |&gt; 
+  separate(group, into = c(&quot;dose&quot;, &quot;day_of_tx&quot;), 3) |&gt; # split at the third character
   mutate(
     dose = str_to_lower(dose),
     day_of_tx = as.numeric(day_of_tx),
