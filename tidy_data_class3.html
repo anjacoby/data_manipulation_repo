@@ -473,6 +473,59 @@ return_df =
     names_to = &quot;gender&quot;,
     values_to = &quot;words&quot;
   )</code></pre>
+<div id="join-fas-datasets" class="section level2">
+<h2>join FAS datasets</h2>
+<pre class="r"><code>pups_df = 
+  read_csv(
+    &quot;data_file/FAS_pups.csv&quot;,
+    skip = 3,
+    na = c(&quot;.&quot;, &quot;&quot;, &quot;NA&quot;)) |&gt; 
+  janitor::clean_names() |&gt; 
+  mutate(
+    sex = case_match( # recoding variables, 1 is male and 2 is female
+      sex,
+      1 ~ &quot;male&quot;,
+      2 ~ &quot;female&quot;
+    )
+  )</code></pre>
+<pre><code>## Rows: 313 Columns: 6
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (1): Litter Number
+## dbl (5): Sex, PD ears, PD eyes, PD pivot, PD walk
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre><code>## Warning: There was 1 warning in `mutate()`.
+## ℹ In argument: `sex = case_match(sex, 1 ~ &quot;male&quot;, 2 ~ &quot;female&quot;)`.
+## Caused by warning:
+## ! `case_match()` was deprecated in dplyr 1.2.0.
+## ℹ Please use `recode_values()` instead.</code></pre>
+<pre class="r"><code>litters_df = 
+  read_csv(
+    &quot;data_file/FAS_litters.csv&quot;,
+    na = c(&quot;.&quot;, &quot;&quot;, &quot;NA&quot;)) |&gt; 
+  janitor::clean_names() |&gt; 
+  relocate(litter_number) |&gt;  # want litter number to appear first
+  separate(group, into = c(&quot;dose&quot;, &quot;day_of_tx&quot;), 3) |&gt; 
+  mutate(
+    dose = str_to_lower(dose),
+    day_of_tx = as.numeric(day_of_tx),
+    gd_weight_gain = gd18_weight - gd0_weight
+  )</code></pre>
+<pre><code>## Rows: 49 Columns: 8
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (2): Group, Litter Number
+## dbl (6): GD0 weight, GD18 weight, GD of Birth, Pups born alive, Pups dead @ ...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>fas_df =
+  left_join(pups_df, litters_df, by = &quot;litter_number&quot;) # tell R what columns are the id variables
+
+# multiple pups have the same litter number, it will just duplicate those rows for you</code></pre>
+</div>
 </div>
 
 
